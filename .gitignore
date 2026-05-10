@@ -1,0 +1,244 @@
+# ==============================================================
+# .gitignore — DevSecOps-30-Days
+# Dự án học DevSecOps: Terraform, Docker, Kubernetes, CI/CD
+# ==============================================================
+
+
+# ---------------------------------------------------------------
+# TERRAFORM
+# ---------------------------------------------------------------
+
+# Thư mục plugin providers (rất nặng, tải lại bằng terraform init)
+**/.terraform/
+.terraform/
+
+# Lock file của provider (nên commit để đảm bảo version nhất quán)
+# .terraform.lock.hcl  # <-- Bỏ comment nếu KHÔNG muốn commit
+
+# State files — chứa toàn bộ thông tin hạ tầng (BÍ MẬT)
+*.tfstate
+*.tfstate.backup
+*.tfstate.d/
+
+# Crash log của Terraform
+crash.log
+crash.*.log
+
+# Biến môi trường Terraform (chứa token, secret keys — CỰC KỲ BÍ MẬT)
+*.tfvars
+*.tfvars.json
+# Ngoại lệ: cho phép file mẫu (không chứa giá trị thật)
+!*.tfvars.example
+!*.tfvars.json.example
+
+# File plan (có thể chứa thông tin nhạy cảm)
+*.tfplan
+*.plan
+
+# File override (chỉ dùng locally, không share)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+
+# ---------------------------------------------------------------
+# SECRETS & CREDENTIALS (CỰC KỲ QUAN TRỌNG)
+# ---------------------------------------------------------------
+
+# Environment variables
+.env
+.env.*
+.envrc
+!.env.example
+!.env.sample
+
+# SSH Keys
+*.pem
+*.key
+*.ppk
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Cloud provider credentials
+.aws/
+.azure/
+.gcloud/
+credentials.json
+service-account*.json
+
+# API tokens / secrets dạng text
+secrets.txt
+secrets.yaml
+secrets.yml
+*secret*
+*token*
+*password*
+*credential*
+# Ngoại lệ: file example/template
+!*secret*.example
+!*token*.example
+
+# Ansible vault
+*.vault
+vault_pass.txt
+
+
+# ---------------------------------------------------------------
+# DOCKER
+# ---------------------------------------------------------------
+
+# File override chỉ dùng local
+docker-compose.override.yml
+docker-compose.local.yml
+
+
+# ---------------------------------------------------------------
+# KUBERNETES / HELM
+# ---------------------------------------------------------------
+
+# Kubeconfig (chứa credentials cluster)
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+.kube/
+
+# Helm chart dependencies
+charts/
+
+
+# ---------------------------------------------------------------
+# ANSIBLE
+# ---------------------------------------------------------------
+
+*.retry
+inventory/host_vars/*/vault.yml
+inventory/group_vars/*/vault.yml
+
+
+# ---------------------------------------------------------------
+# CI/CD & BUILD ARTIFACTS
+# ---------------------------------------------------------------
+
+# Logs
+*.log
+logs/
+log/
+
+# Build output
+dist/
+build/
+out/
+target/
+bin/
+obj/
+
+# Test coverage
+coverage/
+.coverage
+*.lcov
+htmlcov/
+
+
+# ---------------------------------------------------------------
+# OS SPECIFIC
+# ---------------------------------------------------------------
+
+# macOS
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+
+# ---------------------------------------------------------------
+# IDE & EDITORS
+# ---------------------------------------------------------------
+
+# VS Code (bỏ comment nếu muốn chia sẻ settings chung)
+.vscode/
+# !.vscode/settings.json     # <-- Bỏ comment để share settings
+# !.vscode/extensions.json   # <-- Bỏ comment để share extensions
+
+# JetBrains (IntelliJ, GoLand, PyCharm...)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*#
+.#*
+
+
+# ---------------------------------------------------------------
+# NGÔN NGỮ & RUNTIME
+# ---------------------------------------------------------------
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Go
+vendor/
+
+# Java / Maven / Gradle
+.gradle/
+*.class
+*.jar
+
+
+# ---------------------------------------------------------------
+# TOOLS & MISC
+# ---------------------------------------------------------------
+
+# Checkov / Trivy / tfsec scan results
+results/
+scan-results/
+*.sarif
+
+# Terraform docs
+.terraform-docs.yml
+
+# direnv
+.direnv/
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*.tmp
