@@ -1,18 +1,52 @@
-# =============================================================================
-# FILE: main.tf (Ngày 2)
-# Mục tiêu: Thiết lập VPC riêng và Firewall thắt chặt bảo mật
-# =============================================================================
+# ==========================================
+# 1. KHAI BÁO BIẾN & PROVIDER
+# ==========================================
 
-# 1. KHAI BÁO BIẾN
 variable "do_token" {
-  type      = string
-  sensitive = true
+  description = "API Token lấy từ bảng điều khiển DigitalOcean"
+  type        = string
+  sensitive   = true
 }
 
-# Biến chứa IP cá nhân của bạn để mở port SSH an toàn
 variable "my_ip" {
-  type    = string
-  default = "118.69.182.144" # IP hiện tại của bạn
+  description = "Địa chỉ IP Public của máy tính bạn đang dùng để SSH"
+  type        = string
+}
+
+variable "region" {
+  description = "Region triển khai hạ tầng"
+  type        = string
+  default     = "sgp1"
+}
+
+variable "vpc_cidr" {
+  description = "Dải IP nội bộ của VPC"
+  type        = string
+  default     = "10.10.10.0/24"
+}
+
+variable "ssh_key_name" {
+  description = "Tên SSH Key đã upload lên DigitalOcean"
+  type        = string
+  default     = "darrenak"
+}
+
+variable "droplet_name" {
+  description = "Tên Droplet"
+  type        = string
+  default     = "devsecops-day-02"
+}
+
+variable "droplet_size" {
+  description = "Size Droplet để tối ưu chi phí khi học"
+  type        = string
+  default     = "s-1vcpu-1gb"
+}
+
+variable "droplet_image" {
+  description = "Image hệ điều hành cho Droplet"
+  type        = string
+  default     = "ubuntu-22-04-x64"
 }
 
 terraform {
@@ -28,46 +62,42 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-# 2. LẤY SSH KEY (Đã có sẵn trên Cloud)
 data "digitalocean_ssh_key" "my_key" {
-  name = "darrenak"
+  name = var.ssh_key_name
 }
 
-# 3. THIẾT LẬP VPC (MẠNG RIÊNG)
-# Tạo một "hàng rào" mạng nội bộ, tách biệt server khỏi mạng công cộng mặc định
 resource "digitalocean_vpc" "my_vpc" {
   name     = "devsecops-vpc"
-  region   = "sgp1"
-  ip_range = "10.10.10.0/24"
+  region   = var.region
+  ip_range = var.vpc_cidr
 }
 
-# 4. TẠO DROPLET TRONG VPC
 resource "digitalocean_droplet" "web" {
-  image    = "ubuntu-22-04-x64"
-  name     = "devsecops-day-02"
-  region   = "sgp1"
-  size     = "s-1vcpu-1gb"
-  vpc_uuid = digitalocean_vpc.my_vpc.id # Gắn vào mạng riêng vừa tạo
+  image  = var.droplet_image
+  name   = var.droplet_name
+  region = var.region
+  size   = var.droplet_size
+
+  vpc_uuid = digitalocean_vpc.my_vpc.id
+
   ssh_keys = [data.digitalocean_ssh_key.my_key.id]
+
+  monitoring = true
+
+  tags = ["web-tier"]
 }
 
-# 5. THIẾT LẬP CLOUD FIREWALL (TƯỜNG LỬA)
 resource "digitalocean_firewall" "web_firewall" {
-  name = "firewall-standard-ports"
+  name = "firewall-strict-policy"
 
-  # Gắn firewall này vào Droplet vừa tạo
   droplet_ids = [digitalocean_droplet.web.id]
 
-  # [INBOUND] - Quy tắc chặn đường vào
-
-  # SSH: Chỉ cho phép IP nhà bạn (An toàn tuyệt đối)
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
     source_addresses = ["${var.my_ip}/32"]
   }
 
-  # HTTP/HTTPS: Mở cho toàn thế giới để khách xem web
   inbound_rule {
     protocol         = "tcp"
     port_range       = "80"
@@ -80,7 +110,6 @@ resource "digitalocean_firewall" "web_firewall" {
     source_addresses = ["0.0.0.0/0", "::/0"]
   }
 
-  # [OUTBOUND] - Cho phép server đi ra ngoài internet (tải update, library)
   outbound_rule {
     protocol              = "tcp"
     port_range            = "1-65535"
@@ -92,9 +121,24 @@ resource "digitalocean_firewall" "web_firewall" {
     port_range            = "1-65535"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
+
+  outbound_rule {
+    protocol              = "icmp"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
 }
 
-# 6. ĐẦU RA
 output "droplet_public_ip" {
-  value = digitalocean_droplet.web.ipv4_address
+  description = "Public IP dùng để SSH hoặc truy cập web"
+  value       = digitalocean_droplet.web.ipv4_address
+}
+
+output "droplet_private_ip" {
+  description = "Private IP dùng để giao tiếp nội bộ trong VPC"
+  value       = digitalocean_droplet.web.ipv4_address_private
+}
+
+output "vpc_id" {
+  description = "ID của VPC"
+  value       = digitalocean_vpc.my_vpc.id
 }
