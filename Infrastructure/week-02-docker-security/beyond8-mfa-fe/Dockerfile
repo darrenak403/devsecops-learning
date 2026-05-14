@@ -34,5 +34,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Ngày 11: non-root (Alpine — addgroup / adduser)
+RUN addgroup -S appgroup \
+    && adduser -S appuser -G appgroup -u 10001 \
+    && chown -R appuser:appgroup /app
+
+USER appuser
+
 EXPOSE 3000
 CMD ["node", "server.js"]

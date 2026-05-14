@@ -42,5 +42,13 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY --from=builder /app /app
 COPY --from=builder /docker-entrypoint.sh /docker-entrypoint.sh
 
+# Ngày 11: non-root (Debian slim — groupadd / useradd)
+RUN groupadd --system appgroup \
+    && useradd --gid appgroup --uid 10001 --no-log-init --create-home \
+        --shell /usr/sbin/nologin appuser \
+    && chown -R appuser:appgroup /app /opt/venv /docker-entrypoint.sh
+
+USER appuser
+
 EXPOSE 8000
 ENTRYPOINT ["/docker-entrypoint.sh"]
