@@ -1,9 +1,11 @@
-# Full stack (Postgres + Redis + API + Next): use ../docker-compose.yml from this folder.
+# Chỉ API (hot reload). Cần file .env cùng thư mục (DATABASE_URL / REDIS_URL trỏ host, ví dụ 127.0.0.1 khi db/redis chạy bằng compose ở thư mục cha).
+# Full stack (db + redis + api + web): từ thư mục cha chạy docker compose -f ../docker-compose.yml …
 services:
   api:
     build: .
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
-      - .env
+      - path: .env
+        required: true
     ports:
       - "8000:8000"

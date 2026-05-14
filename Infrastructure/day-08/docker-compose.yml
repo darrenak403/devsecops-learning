@@ -1,3 +1,11 @@
+# API: env từ beyond8-mfa/.env; DATABASE_URL / ASYNC_DATABASE_URL / REDIS_URL bị override
+# bên dưới để trỏ tới service trong mạng Docker (db, redis).
+#
+# Web (build args): mặc định khớp beyond8-mfa-fe/.env. Để build dùng đúng file .env của FE
+# (một nguồn): docker compose --env-file ./beyond8-mfa-fe/.env up --build
+#
+# Compose tự đọc file .env trong thư mục day-08 (nếu có) để thay thế ${...} trong file này.
+
 services:
   db:
     image: postgres:16-alpine
@@ -32,7 +40,8 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./env.docker
+      - path: ./beyond8-mfa/.env
+        required: true
     environment:
       DATABASE_URL: postgresql+psycopg2://beyond8:beyond8@db:5432/beyond8_mfa
       ASYNC_DATABASE_URL: postgresql+asyncpg://beyond8:beyond8@db:5432/beyond8_mfa
@@ -49,10 +58,14 @@ services:
       context: ./beyond8-mfa-fe
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:8000
-        NEXT_PUBLIC_APP_NAME: Beyond8 MFA
-        NEXT_PUBLIC_APP_URL: http://localhost:3000
-        NEXT_PUBLIC_ENV: development
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Learning Source Auth}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+        NEXT_PUBLIC_ENV: ${NEXT_PUBLIC_ENV:-development}
+        NEXT_PUBLIC_COOKIE_DOMAIN: ${NEXT_PUBLIC_COOKIE_DOMAIN:-.localhost}
+    env_file:
+      - path: ./beyond8-mfa-fe/.env
+        required: false
     ports:
       - "3000:3000"
     depends_on:
