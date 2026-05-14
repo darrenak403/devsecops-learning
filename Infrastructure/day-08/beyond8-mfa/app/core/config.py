@@ -63,6 +63,11 @@ class Settings(BaseSettings):
 
     key_prefix: str = Field(default="BY8", alias="KEY_PREFIX")
     redis_enabled: bool = Field(default=False, alias="REDIS_ENABLED")
+    redis_url: str = Field(
+        default="",
+        alias="REDIS_URL",
+        description="Standard Redis TCP URL (docker/redis local), e.g. redis://redis:6379/0",
+    )
     upstash_redis_rest_url: str = Field(default="", alias="UPSTASH_REDIS_REST_URL")
     upstash_redis_rest_token: str = Field(default="", alias="UPSTASH_REDIS_REST_TOKEN")
     cors_origins: str = Field(

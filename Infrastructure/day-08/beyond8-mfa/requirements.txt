@@ -9,5 +9,6 @@ psycopg2-binary==2.9.11
 asyncpg==0.30.0
 python-jose==3.3.0
 python-multipart==0.0.26
+redis==5.2.1
 upstash-redis
 pytest==9.0.3

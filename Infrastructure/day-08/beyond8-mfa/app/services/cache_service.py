@@ -13,10 +13,25 @@ logger = logging.getLogger(__name__)
 class CacheService:
     def __init__(self) -> None:
         self._client = None
+        self._use_tcp_redis = False
         if not settings.redis_enabled:
             return
+        redis_url = (settings.redis_url or "").strip()
+        if redis_url:
+            try:
+                import redis as redis_lib
+
+                self._client = redis_lib.Redis.from_url(redis_url, decode_responses=True)
+                self._client.ping()
+                self._use_tcp_redis = True
+            except Exception as exc:  # pragma: no cover - defensive runtime guard
+                logger.warning("Failed to initialize Redis (REDIS_URL) client: %s", exc)
+                self._client = None
+            return
         if not settings.upstash_redis_rest_url or not settings.upstash_redis_rest_token:
-            logger.warning("REDIS_ENABLED=true but Upstash credentials are missing. Cache disabled.")
+            logger.warning(
+                "REDIS_ENABLED=true but neither REDIS_URL nor Upstash credentials are set. Cache disabled."
+            )
             return
         try:
             from upstash_redis import Redis
@@ -52,6 +67,10 @@ class CacheService:
             raw_value = self._client.get(self._key(key))
             if raw_value is None:
                 return None
+            if self._use_tcp_redis:
+                if isinstance(raw_value, str):
+                    return json.loads(raw_value)
+                return raw_value
             if isinstance(raw_value, (dict, list, int, float, bool)):
                 return raw_value
             return json.loads(raw_value)

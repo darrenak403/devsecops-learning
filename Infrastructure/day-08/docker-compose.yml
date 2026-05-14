@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: beyond8
+      POSTGRES_PASSWORD: beyond8
+      POSTGRES_DB: beyond8_mfa
+    ports:
+      - "5432:5432"
+    volumes:
+      - beyond8_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beyond8 -d beyond8_mfa"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ./beyond8-mfa
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./env.docker
+    environment:
+      DATABASE_URL: postgresql+psycopg2://beyond8:beyond8@db:5432/beyond8_mfa
+      ASYNC_DATABASE_URL: postgresql+asyncpg://beyond8:beyond8@db:5432/beyond8_mfa
+      REDIS_ENABLED: "true"
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./beyond8-mfa-fe
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_APP_NAME: Beyond8 MFA
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+        NEXT_PUBLIC_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  beyond8_pgdata:
