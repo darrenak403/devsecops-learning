@@ -5,9 +5,16 @@
 # (một nguồn): docker compose --env-file ./beyond8-mfa-fe/.env up --build
 #
 # Compose tự đọc file .env trong thư mục day-08 (nếu có) để thay thế ${...} trong file này.
+#
+# Adminer (8080): UI quản lý Postgres — image nhẹ, đủ SQL / bảng / import-export.
+#
+# Tên project / container / volume dùng tiền tố beyond8 (xem name + container_name + volumes).
+
+name: beyond8
 
 services:
   db:
+    container_name: beyond8-db
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: beyond8
@@ -16,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - beyond8_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U beyond8 -d beyond8_mfa"]
       interval: 5s
@@ -24,6 +31,7 @@ services:
       retries: 5
 
   redis:
+    container_name: beyond8-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
@@ -33,7 +41,19 @@ services:
       timeout: 3s
       retries: 5
 
+  adminer:
+    container_name: beyond8-adminer
+    image: adminer:4
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+
   api:
+    container_name: beyond8-api
     build:
       context: ./beyond8-mfa
       dockerfile: Dockerfile
@@ -54,6 +74,7 @@ services:
         condition: service_healthy
 
   web:
+    container_name: beyond8-web
     build:
       context: ./beyond8-mfa-fe
       dockerfile: Dockerfile
@@ -72,4 +93,5 @@ services:
       - api
 
 volumes:
-  beyond8_pgdata:
+  pgdata:
+    name: beyond8_pgdata

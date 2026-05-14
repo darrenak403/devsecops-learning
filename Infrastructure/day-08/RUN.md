@@ -1,37 +1,54 @@
-# Chạy nhanh — day-08 (Beyond8 MFA)
+# Chạy day-08 (Beyond8 MFA)
 
-## Database & Redis hiện tại
+Làm việc trong thư mục **`Infrastructure/day-08`** khi dùng Docker Compose (project **`beyond8`**: container `beyond8-db`, `beyond8-redis`, …; volume Postgres **`beyond8_pgdata`**).
 
-- **Postgres**: image Docker `postgres:16-alpine`, user / mật khẩu / DB: `beyond8` / `beyond8` / `beyond8_mfa`, dữ liệu trong volume `beyond8_pgdata`, cổng host **`5432`**.
-- **Redis**: image `redis:7-alpine`, cổng host **`6379`**.
-- Khi chạy **full stack** bằng compose, API trong container **không** dùng `127.0.0.1` trong `.env` — compose **ghi đè** chuỗi kết nối trỏ tới service `db` và `redis` trong mạng Docker.
+| Dịch vụ | Cổng (máy bạn) |
+|---------|----------------|
+| API | 8000 |
+| Next | 3000 |
+| Postgres | 5432 |
+| Redis | 6379 |
+| Adminer (UI Postgres) | 8080 |
 
 ---
 
-## Chỉ backend (API trên máy)
-
-Cần `beyond8-mfa/.env` (DB/Redis trỏ `127.0.0.1` như đã cấu hình).
+## Một lần — cả stack (Postgres + Redis + API + Next)
 
 ```bash
 cd Infrastructure/day-08
-docker compose up -d db redis
+docker compose up --build
 ```
+
+- Web: http://localhost:3000  
+- API: http://localhost:8000  
+- **Adminer** (quản lý DB, image nhẹ): http://localhost:8080 — chọn hệ **PostgreSQL**, server **`db`**, user / pass / database: **`beyond8`** / **`beyond8`** / **`beyond8_mfa`**.
+
+*(Tuỳ chọn: build FE đúng theo `beyond8-mfa-fe/.env` — `docker compose --env-file ./beyond8-mfa-fe/.env up --build`.)*
+
+---
+
+## Riêng từng repo (API / FE trên máy, DB + Redis bằng Docker)
+
+**1. Bật DB + Redis (một lần, hoặc mỗi khi tắt Docker):**
+
+```bash
+cd Infrastructure/day-08
+docker compose up -d db redis adminer
+```
+
+Adminer: http://localhost:8080 — **PostgreSQL**, server **`db`**, user **`beyond8`**, mật khẩu **`beyond8`**, database **`beyond8_mfa`**.
+
+**2. Backend** (`beyond8-mfa/.env` trỏ `127.0.0.1` cho DB/Redis):
 
 ```bash
 cd Infrastructure/day-08/beyond8-mfa
-source .venv/bin/activate   # hoặc tạo .venv trước: python3 -m venv .venv
+python3 -m venv .venv && source .venv/bin/activate   # lần đầu
 pip install -r requirements.txt
 alembic upgrade head
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-API: `http://localhost:8000`
-
----
-
-## Chỉ frontend (Next trên máy)
-
-Cần API đang chạy (ví dụ cổng **8000**) và `beyond8-mfa-fe/.env` (`NEXT_PUBLIC_API_URL=http://localhost:8000`).
+**3. Frontend** (`beyond8-mfa-fe/.env` có `NEXT_PUBLIC_API_URL=http://localhost:8000`):
 
 ```bash
 cd Infrastructure/day-08/beyond8-mfa-fe
@@ -39,45 +56,29 @@ npm install
 npm run dev
 ```
 
-App: `http://localhost:3000`
+Hai repo = hai terminal (BE rồi FE).
 
 ---
 
-## Backend + frontend cùng lúc (trên máy, không Docker hóa API/FE)
+## Lệnh Docker hay dùng
 
-Hai terminal:
-
-1. `docker compose up -d db redis` (từ `Infrastructure/day-08`) → rồi uvicorn như mục **Chỉ backend**.  
-2. `npm run dev` trong `beyond8-mfa-fe`.
-
----
-
-## Tất cả trong Docker (db + redis + api + web)
-
-Từ `Infrastructure/day-08`:
+Tất cả chạy từ `Infrastructure/day-08` (cùng chỗ với `docker-compose.yml`).
 
 ```bash
-docker compose up --build
+cd Infrastructure/day-08
 ```
 
-- API: `http://localhost:8000`  
-- Web: `http://localhost:3000`  
-
-Build web đúng theo `beyond8-mfa-fe/.env` (nếu cần):
-
-```bash
-docker compose --env-file ./beyond8-mfa-fe/.env up --build
-```
-
----
-
-## Gợi ý nhanh
-
-| Mục | Giá trị |
-|-----|--------|
-| API (local / compose publish) | **8000** |
-| Next (dev / compose) | **3000** |
-| Postgres (host) | **5432** |
-| Redis (host) | **6379** |
-
-Dừng chỉ db + redis: `docker compose stop db redis`. Xóa luôn dữ liệu Postgres: `docker compose down -v` (cẩn thận: mất volume).
+| Việc | Lệnh |
+|------|------|
+| Xem container đang chạy | `docker compose ps` |
+| Xem log (tất cả) | `docker compose logs -f` |
+| Log một service | `docker compose logs -f api` |
+| Liệt kê volume Docker | `docker volume ls` (tìm `beyond8_pgdata`) |
+| Dừng stack (giữ volume DB) | `docker compose stop` |
+| Tắt và xóa container (giữ volume) | `docker compose down` |
+| Tắt + xóa volume Postgres (**mất dữ liệu**) | `docker compose down -v` |
+| Chỉ dừng db + redis + adminer | `docker compose stop db redis adminer` |
+| Build lại rồi chạy | `docker compose up --build` |
+| Vào shell Postgres | `docker compose exec db psql -U beyond8 -d beyond8_mfa` |
+| Ping Redis | `docker compose exec redis redis-cli ping` |
+| Chỉ bật UI DB (kèm Postgres) | `docker compose up -d db adminer` |
