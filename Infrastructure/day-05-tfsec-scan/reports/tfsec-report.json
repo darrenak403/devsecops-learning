@@ -1,0 +1,234 @@
+{
+	"results": [
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 97,
+				"end_line": 97
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 97,
+				"end_line": 97
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 92,
+				"end_line": 92
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 92,
+				"end_line": 92
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 86,
+				"end_line": 86
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0003",
+			"long_id": "digitalocean-compute-no-public-egress",
+			"rule_description": "The firewall has an outbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "The port is exposed for ingress from the internet",
+			"resolution": "Set a more restrictive cidr range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-egress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Egress rule allows access to multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 86,
+				"end_line": 86
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0001",
+			"long_id": "digitalocean-compute-no-public-ingress",
+			"rule_description": "The firewall has an inbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "Your port is exposed to the internet",
+			"resolution": "Set a more restrictive CIRDR range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-ingress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Ingress rule allows access from multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 80,
+				"end_line": 80
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0001",
+			"long_id": "digitalocean-compute-no-public-ingress",
+			"rule_description": "The firewall has an inbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "Your port is exposed to the internet",
+			"resolution": "Set a more restrictive CIRDR range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-ingress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Ingress rule allows access from multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 80,
+				"end_line": 80
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0001",
+			"long_id": "digitalocean-compute-no-public-ingress",
+			"rule_description": "The firewall has an inbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "Your port is exposed to the internet",
+			"resolution": "Set a more restrictive CIRDR range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-ingress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Ingress rule allows access from multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 74,
+				"end_line": 74
+			}
+		},
+		{
+			"rule_id": "AVD-DIG-0001",
+			"long_id": "digitalocean-compute-no-public-ingress",
+			"rule_description": "The firewall has an inbound rule with open access",
+			"rule_provider": "digitalocean",
+			"rule_service": "compute",
+			"impact": "Your port is exposed to the internet",
+			"resolution": "Set a more restrictive CIRDR range",
+			"links": [
+				"https://aquasecurity.github.io/tfsec/v1.28.14/checks/digitalocean/compute/no-public-ingress/",
+				"https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall"
+			],
+			"description": "Ingress rule allows access from multiple public addresses.",
+			"severity": "CRITICAL",
+			"warning": false,
+			"status": 0,
+			"resource": "digitalocean_firewall.web_firewall",
+			"location": {
+				"filename": "/Users/ngothanhdat/Documents/CODE/2. Study/DevSecOps-30-days/Infrastructure/day-05-tfsec-scan/main.tf",
+				"start_line": 74,
+				"end_line": 74
+			}
+		}
+	]
+}
