@@ -1,0 +1,108 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/plan-context.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/pre-compact.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/session-start.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/observe.py pre",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/suggest_compact.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/observe.py post",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/build-check.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/session-end.py",
+            "async": true,
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "**/bin/**",
+    "**/obj/**",
+    "**/.vs/**",
+    "**/.git/**",
+    "**/Migrations/**",
+    "**/TestResults/**",
+    "**/coverage/**",
+    "**/.claude/session-data/**",
+    "**/*.suo",
+    "**/*.user",
+    "**/*.lock.json",
+    "**/node_modules/**"
+  ],
+  "env": {
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "true"
+  }
+}

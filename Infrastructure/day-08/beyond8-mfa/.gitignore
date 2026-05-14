@@ -1,0 +1,48 @@
+__pycache__/
+*.pyc
+.env
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs and temp
+*.log
+*.tmp
+
+# Build outputs
+dist/
+build/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Node
+node_modules/
+
+# .NET
+bin/
+obj/
+
+# Claude Code — personal overrides (never commit)
+CLAUDE.local.md
+**/settings.local.json
+
+# Claude Code — session and project data
+**/session-data
+projects/
+**/projects/
+
+# Generated plan output
+plans/*
+docs/
+.gitnexus
