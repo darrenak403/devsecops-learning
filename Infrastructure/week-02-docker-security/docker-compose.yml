@@ -4,7 +4,7 @@
 # Web (build args): mặc định khớp beyond8-mfa-fe/.env. Để build dùng đúng file .env của FE
 # (một nguồn): docker compose --env-file ./beyond8-mfa-fe/.env up --build
 #
-# Compose tự đọc file .env trong thư mục day-08 (nếu có) để thay thế ${...} trong file này.
+# Compose tự đọc file .env trong thư mục week-02-docker-security (nếu có) để thay thế ${...} trong file này.
 #
 # Adminer (8080): UI quản lý Postgres — image nhẹ, đủ SQL / bảng / import-export.
 #

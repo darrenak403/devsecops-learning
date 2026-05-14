@@ -1,6 +1,6 @@
-# Chạy day-08 (Beyond8 MFA)
+# Beyond8 MFA — Docker (week 02)
 
-Làm việc trong thư mục **`Infrastructure/day-08`** khi dùng Docker Compose (project **`beyond8`**: container `beyond8-db`, `beyond8-redis`, …; volume Postgres **`beyond8_pgdata`**).
+Làm việc trong thư mục **`Infrastructure/week-02-docker-security`** khi dùng Docker Compose (project **`beyond8`**: container `beyond8-db`, `beyond8-redis`, …; volume Postgres **`beyond8_pgdata`**).
 
 | Dịch vụ | Cổng (máy bạn) |
 |---------|----------------|
@@ -15,7 +15,7 @@ Làm việc trong thư mục **`Infrastructure/day-08`** khi dùng Docker Compos
 ## Một lần — cả stack (Postgres + Redis + API + Next)
 
 ```bash
-cd Infrastructure/day-08
+cd Infrastructure/week-02-docker-security
 docker compose up --build
 ```
 
@@ -32,7 +32,7 @@ docker compose up --build
 **1. Bật DB + Redis (một lần, hoặc mỗi khi tắt Docker):**
 
 ```bash
-cd Infrastructure/day-08
+cd Infrastructure/week-02-docker-security
 docker compose up -d db redis adminer
 ```
 
@@ -41,7 +41,7 @@ Adminer: http://localhost:8080 — **PostgreSQL**, server **`db`**, user **`beyo
 **2. Backend** (`beyond8-mfa/.env` trỏ `127.0.0.1` cho DB/Redis):
 
 ```bash
-cd Infrastructure/day-08/beyond8-mfa
+cd Infrastructure/week-02-docker-security/beyond8-mfa
 python3 -m venv .venv && source .venv/bin/activate   # lần đầu
 pip install -r requirements.txt
 alembic upgrade head
@@ -51,7 +51,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 **3. Frontend** (`beyond8-mfa-fe/.env` có `NEXT_PUBLIC_API_URL=http://localhost:8000`):
 
 ```bash
-cd Infrastructure/day-08/beyond8-mfa-fe
+cd Infrastructure/week-02-docker-security/beyond8-mfa-fe
 npm install
 npm run dev
 ```
@@ -62,10 +62,10 @@ Hai repo = hai terminal (BE rồi FE).
 
 ## Lệnh Docker hay dùng
 
-Tất cả chạy từ `Infrastructure/day-08` (cùng chỗ với `docker-compose.yml`).
+Tất cả chạy từ `Infrastructure/week-02-docker-security` (cùng chỗ với `docker-compose.yml`).
 
 ```bash
-cd Infrastructure/day-08
+cd Infrastructure/week-02-docker-security
 ```
 
 | Việc | Lệnh |
