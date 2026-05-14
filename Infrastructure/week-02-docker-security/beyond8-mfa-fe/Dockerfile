@@ -8,6 +8,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Giảm noise build + tránh gửi telemetry trong CI/container (Ngày 10)
+ENV NEXT_TELEMETRY_DISABLED=1
+
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
 ARG NEXT_PUBLIC_APP_NAME=Beyond8 MFA
 ARG NEXT_PUBLIC_APP_URL=http://localhost:3000

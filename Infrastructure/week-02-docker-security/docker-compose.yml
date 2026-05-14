@@ -43,7 +43,8 @@ services:
 
   adminer:
     container_name: beyond8-adminer
-    image: adminer:4
+    # Standalone: PHP built-in server, image nhỏ hơn bản full (Ngày 10 — tối ưu base)
+    image: adminer:4-standalone
     ports:
       - "8080:8080"
     environment:

@@ -1,9 +1,11 @@
 # syntax=docker/dockerfile:1
 
 # -----------------------------------------------------------------------------
-# Builder: venv + pip install (thêm build-essential ở stage này nếu package cần compile)
+# Builder — Ngày 10: base `python:3.12-slim` (Debian slim, khuyến nghị cho Python)
 # -----------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.12-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
@@ -21,9 +23,12 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # -----------------------------------------------------------------------------
-# Runtime: chỉ thư viện OS cần cho runtime + artifact từ builder
+# Runtime — cùng family slim; chỉ libpq cho psycopg2
 # -----------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm AS runtime
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
