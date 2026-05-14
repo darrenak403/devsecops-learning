@@ -1,0 +1,115 @@
+
+Report Summary
+
+┌─────────┬───────────┬───────────────────┐
+│ Target  │   Type    │ Misconfigurations │
+├─────────┼───────────┼───────────────────┤
+│ .       │ terraform │         0         │
+├─────────┼───────────┼───────────────────┤
+│ main.tf │ terraform │         5         │
+└─────────┴───────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+main.tf (terraform)
+===================
+Tests: 5 (SUCCESSES: 0, FAILURES: 5)
+Failures: 5 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 5)
+
+DIG-0001 (CRITICAL): Firewall rule allows unrestricted ingress from any IP address.
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+Opening up ports to allow connections from the public internet is generally to be avoided. You should restrict access to IP addresses or ranges that are explicitly required where possible.
+
+
+See https://avd.aquasec.com/misconfig/dig-0001
+───────────────────────────────────────────────────────────────────────────────────────────────────
+ main.tf:81
+   via main.tf:78-82 (inbound_rule)
+    via main.tf:60-116 (digitalocean_firewall.web_firewall)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  60   resource "digitalocean_firewall" "web_firewall" {
+  ..   
+  81 [     source_addresses = ["0.0.0.0/0", "::/0"]
+ ...   
+ 116   }
+───────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DIG-0001 (CRITICAL): Firewall rule allows unrestricted ingress from any IP address.
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+Opening up ports to allow connections from the public internet is generally to be avoided. You should restrict access to IP addresses or ranges that are explicitly required where possible.
+
+
+See https://avd.aquasec.com/misconfig/dig-0001
+───────────────────────────────────────────────────────────────────────────────────────────────────
+ main.tf:89
+   via main.tf:86-90 (inbound_rule)
+    via main.tf:60-116 (digitalocean_firewall.web_firewall)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  60   resource "digitalocean_firewall" "web_firewall" {
+  ..   
+  89 [     source_addresses = ["0.0.0.0/0", "::/0"]
+ ...   
+ 116   }
+───────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DIG-0003 (CRITICAL): Firewall rule allows egress traffic to any IP address.
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+Opening up ports to connect out to the public internet is generally to be avoided. You should restrict access to IP addresses or ranges that are explicitly required where possible.
+
+
+See https://avd.aquasec.com/misconfig/dig-0003
+───────────────────────────────────────────────────────────────────────────────────────────────────
+ main.tf:100
+   via main.tf:97-101 (outbound_rule)
+    via main.tf:60-116 (digitalocean_firewall.web_firewall)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  60   resource "digitalocean_firewall" "web_firewall" {
+  ..   
+ 100 [     destination_addresses = ["0.0.0.0/0", "::/0"]
+ ...   
+ 116   }
+───────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DIG-0003 (CRITICAL): Firewall rule allows egress traffic to any IP address.
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+Opening up ports to connect out to the public internet is generally to be avoided. You should restrict access to IP addresses or ranges that are explicitly required where possible.
+
+
+See https://avd.aquasec.com/misconfig/dig-0003
+───────────────────────────────────────────────────────────────────────────────────────────────────
+ main.tf:107
+   via main.tf:104-108 (outbound_rule)
+    via main.tf:60-116 (digitalocean_firewall.web_firewall)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  60   resource "digitalocean_firewall" "web_firewall" {
+  ..   
+ 107 [     destination_addresses = ["0.0.0.0/0", "::/0"]
+ ...   
+ 116   }
+───────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DIG-0003 (CRITICAL): Firewall rule allows egress traffic to any IP address.
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+Opening up ports to connect out to the public internet is generally to be avoided. You should restrict access to IP addresses or ranges that are explicitly required where possible.
+
+
+See https://avd.aquasec.com/misconfig/dig-0003
+───────────────────────────────────────────────────────────────────────────────────────────────────
+ main.tf:114
+   via main.tf:111-115 (outbound_rule)
+    via main.tf:60-116 (digitalocean_firewall.web_firewall)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  60   resource "digitalocean_firewall" "web_firewall" {
+  ..   
+ 114 [     destination_addresses = ["0.0.0.0/0", "::/0"]
+ ...   
+ 116   }
+───────────────────────────────────────────────────────────────────────────────────────────────────
+
+
