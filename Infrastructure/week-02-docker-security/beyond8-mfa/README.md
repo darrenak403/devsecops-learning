@@ -52,7 +52,7 @@ Hệ thống nên được đưa vào venv để khởi chạy:
 # Ở thư mục gốc của repo backend
 
 # Cài đặt dependencies
-.venv\Scripts\pip.exe install -r requirements.txt
+.venv\Scripts\pip.exe install -r requirements-dev.txt
 
 # Tự động đẩy DB lên trạng thái mới nhất
 .venv\Scripts\python.exe run_migration.py

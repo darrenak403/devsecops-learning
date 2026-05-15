@@ -10,7 +10,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 
 RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+ENV PATH="/opt/venv/bin:$PATH" \
+    PIP_DEFAULT_TIMEOUT=300 \
+    PIP_RETRIES=10
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \

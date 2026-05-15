@@ -43,7 +43,7 @@ Adminer: http://localhost:8080 — **PostgreSQL**, server **`db`**, user **`beyo
 ```bash
 cd Infrastructure/week-02-docker-security/beyond8-mfa
 python3 -m venv .venv && source .venv/bin/activate   # lần đầu
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 alembic upgrade head
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```

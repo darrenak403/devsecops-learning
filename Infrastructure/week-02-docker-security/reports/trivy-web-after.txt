@@ -1,3 +1,12 @@
+2026-05-15T08:03:02+07:00	INFO	[vuln] Vulnerability scanning is enabled
+2026-05-15T08:03:02+07:00	INFO	[secret] Secret scanning is enabled
+2026-05-15T08:03:02+07:00	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-05-15T08:03:02+07:00	INFO	[secret] Please see https://trivy.dev/docs/v0.70/guide/scanner/secret#recommendation for faster secret detection
+2026-05-15T08:03:02+07:00	INFO	Detected OS	family="alpine" version="3.23.4"
+2026-05-15T08:03:02+07:00	INFO	[alpine] Detecting vulnerabilities...	os_version="3.23" repository="3.23" pkg_num=18
+2026-05-15T08:03:02+07:00	INFO	Number of language-specific files	num=1
+2026-05-15T08:03:02+07:00	INFO	[node-pkg] Detecting vulnerabilities...
+2026-05-15T08:03:02+07:00	INFO	Table result includes only package filenames. Use '--format json' option to get the full path to the package file.
 
 Report Summary
 
@@ -34,7 +43,7 @@ Report Summary
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ app/node_modules/next/dist/compiled/regenerator-runtime/package.json             │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
-│ app/node_modules/next/package.json                                               │ node-pkg │       13        │    -    │
+│ app/node_modules/next/package.json                                               │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ app/node_modules/react-dom/package.json                                          │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
@@ -142,7 +151,7 @@ Report Summary
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/binary-extensions/package.json       │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
-│ usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json         │ node-pkg │        1        │    -    │
+│ usr/local/lib/node_modules/npm/node_modules/brace-expansion/package.json         │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/cacache/package.json                 │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
@@ -217,7 +226,7 @@ Report Summary
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/init-package-json/package.json       │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
-│ usr/local/lib/node_modules/npm/node_modules/ip-address/package.json              │ node-pkg │        1        │    -    │
+│ usr/local/lib/node_modules/npm/node_modules/ip-address/package.json              │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/ip-regex/package.json                │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
@@ -345,7 +354,7 @@ Report Summary
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/path-scurry/package.json             │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
-│ usr/local/lib/node_modules/npm/node_modules/picomatch/package.json               │ node-pkg │        2        │    -    │
+│ usr/local/lib/node_modules/npm/node_modules/picomatch/package.json               │ node-pkg │        1        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
 │ usr/local/lib/node_modules/npm/node_modules/postcss-selector-parser/package.json │ node-pkg │        0        │    -    │
 ├──────────────────────────────────────────────────────────────────────────────────┼──────────┼─────────────────┼─────────┤
@@ -481,74 +490,12 @@ Legend:
 
 Node.js (node-pkg)
 ==================
-Total: 17 (UNKNOWN: 0, LOW: 2, MEDIUM: 7, HIGH: 8, CRITICAL: 0)
+Total: 1 (HIGH: 1, CRITICAL: 0)
 
-┌────────────────────────────────┬─────────────────────┬──────────┬────────┬───────────────────┬─────────────────────────────┬──────────────────────────────────────────────────────────────┐
-│            Library             │    Vulnerability    │ Severity │ Status │ Installed Version │        Fixed Version        │                            Title                             │
-├────────────────────────────────┼─────────────────────┼──────────┼────────┼───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ brace-expansion (package.json) │ CVE-2026-33750      │ MEDIUM   │ fixed  │ 2.0.2             │ 5.0.5, 3.0.2, 2.0.3, 1.1.13 │ brace-expansion: brace-expansion: Denial of Service via zero │
-│                                │                     │          │        │                   │                             │ step value in brace pattern...                               │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-33750                   │
-├────────────────────────────────┼─────────────────────┤          │        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ ip-address (package.json)      │ CVE-2026-42338      │          │        │ 10.1.0            │ 10.1.1                      │ ip-address has XSS in Address6 HTML-emitting methods         │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-42338                   │
-├────────────────────────────────┼─────────────────────┼──────────┤        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ next (package.json)            │ CVE-2026-44573      │ HIGH     │        │ 16.2.3            │ 15.5.16, 16.2.5             │ Next.js has a Middleware / Proxy bypass in Pages Router      │
-│                                │                     │          │        │                   │                             │ applications using...                                        │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44573                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44574      │          │        │                   │                             │ Next.js has a Middleware / Proxy bypass through dynamic      │
-│                                │                     │          │        │                   │                             │ route parameter injection...                                 │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44574                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44575      │          │        │                   │                             │ Next.js has a Middleware / Proxy bypass in App Router        │
-│                                │                     │          │        │                   │                             │ applications via...                                          │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44575                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44578      │          │        │                   │                             │ Next.js vulnerable to server-side request forgery in         │
-│                                │                     │          │        │                   │                             │ applications using WebSocket upgrades                        │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44578                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44579      │          │        │                   │                             │ Next.js vulnerable to Denial of Service via connection       │
-│                                │                     │          │        │                   │                             │ exhaustion in applications using...                          │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44579                   │
-│                                ├─────────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-45109      │          │        │                   │ 15.5.18, 16.2.6             │ Next.js has a Middleware / Proxy bypass in App Router        │
-│                                │                     │          │        │                   │                             │ applications via...                                          │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-45109                   │
-│                                ├─────────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│                                │ GHSA-8h8q-6873-q5fj │          │        │                   │ 15.5.16, 16.2.5             │ Next.js Vulnerable to Denial of Service with Server          │
-│                                │                     │          │        │                   │                             │ Components                                                   │
-│                                │                     │          │        │                   │                             │ https://github.com/advisories/GHSA-8h8q-6873-q5fj            │
-│                                ├─────────────────────┼──────────┤        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44576      │ MEDIUM   │        │                   │                             │ Next.js vulnerable to cache poisoning in React Server        │
-│                                │                     │          │        │                   │                             │ Component responses                                          │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44576                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44577      │          │        │                   │                             │ Next.js has a Denial of Service in the Image Optimization    │
-│                                │                     │          │        │                   │                             │ API                                                          │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44577                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44580      │          │        │                   │                             │ Next.js has cross-site scripting in beforeInteractive        │
-│                                │                     │          │        │                   │                             │ scripts with untrusted input                                 │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44580                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44581      │          │        │                   │                             │ Next.js vulnerable to cross-site scripting in App Router     │
-│                                │                     │          │        │                   │                             │ applications using CSP nonces...                             │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44581                   │
-│                                ├─────────────────────┼──────────┤        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44572      │ LOW      │        │                   │                             │ Next.js's Middleware / Proxy redirects can be cache-poisoned │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44572                   │
-│                                ├─────────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-44582      │          │        │                   │                             │ Next.js vulnerable to cache poisoning via collisions in      │
-│                                │                     │          │        │                   │                             │ React Server Component cache-busting...                      │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-44582                   │
-├────────────────────────────────┼─────────────────────┼──────────┤        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
-│ picomatch (package.json)       │ CVE-2026-33671      │ HIGH     │        │ 4.0.3             │ 4.0.4, 3.0.2, 2.3.2         │ picomatch: Picomatch: Regular Expression Denial of Service   │
-│                                │                     │          │        │                   │                             │ via crafted extglob patterns                                 │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-33671                   │
-│                                ├─────────────────────┼──────────┤        │                   │                             ├──────────────────────────────────────────────────────────────┤
-│                                │ CVE-2026-33672      │ MEDIUM   │        │                   │                             │ picomatch: Picomatch: Data integrity compromised via method  │
-│                                │                     │          │        │                   │                             │ injection with crafted POSIX bracket...                      │
-│                                │                     │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-33672                   │
-└────────────────────────────────┴─────────────────────┴──────────┴────────┴───────────────────┴─────────────────────────────┴──────────────────────────────────────────────────────────────┘
+┌──────────────────────────┬────────────────┬──────────┬────────┬───────────────────┬─────────────────────┬────────────────────────────────────────────────────────────┐
+│         Library          │ Vulnerability  │ Severity │ Status │ Installed Version │    Fixed Version    │                           Title                            │
+├──────────────────────────┼────────────────┼──────────┼────────┼───────────────────┼─────────────────────┼────────────────────────────────────────────────────────────┤
+│ picomatch (package.json) │ CVE-2026-33671 │ HIGH     │ fixed  │ 4.0.3             │ 4.0.4, 3.0.2, 2.3.2 │ picomatch: Picomatch: Regular Expression Denial of Service │
+│                          │                │          │        │                   │                     │ via crafted extglob patterns                               │
+│                          │                │          │        │                   │                     │ https://avd.aquasec.com/nvd/cve-2026-33671                 │
+└──────────────────────────┴────────────────┴──────────┴────────┴───────────────────┴─────────────────────┴────────────────────────────────────────────────────────────┘
