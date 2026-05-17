@@ -126,3 +126,5 @@ Workflow: **`.github/workflows/beyond8-sonarcloud-sast.yml`** (root repo `DevSec
 **Kết quả:** tab **Actions** trên GitHub + dashboard **SonarCloud** (Quality Gate, Bugs, Vulnerabilities, Security Hotspots).
 
 Mẫu config local: `sonar-project.properties.example` (không commit `sonar-project.properties` nếu chỉ dùng CI generate).
+
+**Lỗi thường gặp — `CI analysis while Automatic Analysis is enabled`:** trên SonarCloud vào **Project → Administration → Analysis Method** → **tắt Automatic Analysis** (chỉ giữ scan qua GitHub Actions). Sau đó re-run workflow.

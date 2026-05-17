@@ -2,8 +2,11 @@
 # Folder: Infrastructure/week-02-docker-security
 #
 # Cấu hình GitHub (repo devsecops-learning):
-#   Secrets:  SONAR_TOKEN          (đã setup)
-#   Variables: SONAR_PROJECT_KEY, SONAR_ORGANIZATION  (điền sau trên SonarCloud)
+#   Secrets:  SONAR_TOKEN
+#   Variables: SONAR_PROJECT_KEY, SONAR_ORGANIZATION
+#
+# SonarCloud (bắt buộc khi dùng CI): Project → Administration → Analysis Method
+#   → tắt "Automatic Analysis", chỉ dùng "CI-based analysis" (workflow này).
 
 name: Day 16 - Beyond8 SonarCloud SAST
 
@@ -72,7 +75,7 @@ jobs:
           grep -E '^sonar\.(projectKey|organization|sources)=' sonar-project.properties
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
