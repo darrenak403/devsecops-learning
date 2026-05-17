@@ -1,0 +1,28 @@
+# Sao chép thành sonar-project.properties khi chạy scan local (scanner CLI).
+# Trên GitHub Actions, file được generate từ Variables — xem beyond8-sonarcloud-sast.yml
+
+sonar.projectKey=YOUR_SONAR_PROJECT_KEY
+sonar.organization=YOUR_SONAR_ORGANIZATION
+
+sonar.projectName=Beyond8 MFA
+sonar.projectVersion=1.0
+
+# Backend Python + Frontend Next.js (relative to thư mục week-02-docker-security)
+sonar.sources=beyond8-mfa,beyond8-mfa-fe
+sonar.tests=beyond8-mfa/app/tests
+sonar.python.version=3.12
+
+sonar.exclusions=\
+**/node_modules/**,\
+**/.next/**,\
+**/dist/**,\
+**/build/**,\
+**/__pycache__/**,\
+**/.venv/**,\
+**/venv/**,\
+**/reports/**,\
+**/.pytest_cache/**,\
+**/coverage/**,\
+**/.git/**
+
+sonar.sourceEncoding=UTF-8

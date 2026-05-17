@@ -1,0 +1,80 @@
+# Ngày 16 — SAST: SonarCloud quét mã nguồn BE (Python) + FE (Next.js/TS)
+# Folder: Infrastructure/week-02-docker-security
+#
+# Cấu hình GitHub (repo devsecops-learning):
+#   Secrets:  SONAR_TOKEN          (đã setup)
+#   Variables: SONAR_PROJECT_KEY, SONAR_ORGANIZATION  (điền sau trên SonarCloud)
+
+name: Day 16 - Beyond8 SonarCloud SAST
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa/**'
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa-fe/**'
+      - 'Infrastructure/week-02-docker-security/sonar-project.properties*'
+      - '.github/workflows/beyond8-sonarcloud-sast.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa/**'
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa-fe/**'
+      - 'Infrastructure/week-02-docker-security/sonar-project.properties*'
+      - '.github/workflows/beyond8-sonarcloud-sast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sonarcloud:
+    name: SonarCloud SAST (API + Web)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check SonarCloud repository variables
+        run: |
+          if [ -z "${{ vars.SONAR_PROJECT_KEY }}" ] || [ -z "${{ vars.SONAR_ORGANIZATION }}" ]; then
+            echo "::error::Thiếu GitHub Variables: SONAR_PROJECT_KEY và/hoặc SONAR_ORGANIZATION."
+            echo "Vào Settings → Secrets and variables → Actions → Variables (tab Variables)."
+            echo "Lấy giá trị từ SonarCloud: Project → Project Information."
+            exit 1
+          fi
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo "::error::Thiếu secret SONAR_TOKEN (SonarCloud → My Account → Security → Generate Token)."
+            exit 1
+          fi
+
+      - name: Generate sonar-project.properties
+        working-directory: Infrastructure/week-02-docker-security
+        run: |
+          cat > sonar-project.properties <<EOF
+          sonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+          sonar.organization=${{ vars.SONAR_ORGANIZATION }}
+          sonar.projectName=Beyond8 MFA
+          sonar.projectVersion=${{ github.sha }}
+          sonar.sources=beyond8-mfa,beyond8-mfa-fe
+          sonar.tests=beyond8-mfa/app/tests
+          sonar.python.version=3.12
+          sonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/__pycache__/**,**/.venv/**,**/venv/**,**/reports/**,**/.pytest_cache/**,**/coverage/**,**/.git/**,**/CLAUDE.md,**/AGENTS.md
+          sonar.sourceEncoding=UTF-8
+          EOF
+          echo "--- sonar-project.properties (keys only) ---"
+          grep -E '^sonar\.(projectKey|organization|sources)=' sonar-project.properties
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          projectBaseDir: Infrastructure/week-02-docker-security

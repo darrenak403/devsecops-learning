@@ -104,3 +104,25 @@ Workflow nằm ở **root repo** `DevSecOps-30-days`:
 **Sau khi sửa Dockerfile / compose:** commit + push, mở tab **Actions** trên GitHub để xem pass/fail.
 
 **Lưu ý:** Ngày 15 chưa push image lên Docker Hub / registry; chỉ kiểm tra build trên runner GitHub.
+
+---
+
+## SonarCloud SAST (Ngày 16)
+
+Workflow: **`.github/workflows/beyond8-sonarcloud-sast.yml`** (root repo `DevSecOps-30-days`).
+
+| Loại | Tên trên GitHub | Ghi chú |
+|------|-----------------|--------|
+| **Secret** | `SONAR_TOKEN` | Token từ SonarCloud → My Account → Security (bạn đã setup) |
+| **Variable** | `SONAR_PROJECT_KEY` | Project key trên SonarCloud (vd. `org_repo`) |
+| **Variable** | `SONAR_ORGANIZATION` | Organization key (vd. tên org SonarCloud) |
+
+**Lấy key:** SonarCloud → chọn project đã import repo → **Project Information**.
+
+**Trigger:** push/PR khi đổi code trong `beyond8-mfa/`, `beyond8-mfa-fe/`, hoặc **Run workflow** thủ công.
+
+**Scan gì:** mã nguồn Python (`beyond8-mfa`) + TypeScript/Next (`beyond8-mfa-fe`) — **không** quét Docker image (Trivy là Ngày 18).
+
+**Kết quả:** tab **Actions** trên GitHub + dashboard **SonarCloud** (Quality Gate, Bugs, Vulnerabilities, Security Hotspots).
+
+Mẫu config local: `sonar-project.properties.example` (không commit `sonar-project.properties` nếu chỉ dùng CI generate).
