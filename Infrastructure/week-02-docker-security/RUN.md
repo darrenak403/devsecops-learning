@@ -82,3 +82,25 @@ cd Infrastructure/week-02-docker-security
 | Vào shell Postgres | `docker compose exec db psql -U beyond8 -d beyond8_mfa` |
 | Ping Redis | `docker compose exec redis redis-cli ping` |
 | Chỉ bật UI DB (kèm Postgres) | `docker compose up -d db adminer` |
+
+---
+
+## GitHub Actions (Ngày 15 — CI build Docker)
+
+Workflow nằm ở **root repo** `DevSecOps-30-days`:
+
+```text
+.github/workflows/beyond8-docker-ci.yml
+```
+
+**Kích hoạt:** push / PR lên `main` hoặc `master` khi đổi file trong `Infrastructure/week-02-docker-security/`, hoặc **Actions → Run workflow** (manual).
+
+**CI làm gì:**
+
+1. Checkout code  
+2. Tạo `.env` tạm từ `.env.example` (không dùng secret thật)  
+3. `docker compose build api web` — build image **beyond8-mfa** (API) và **beyond8-mfa-fe** (Web)
+
+**Sau khi sửa Dockerfile / compose:** commit + push, mở tab **Actions** trên GitHub để xem pass/fail.
+
+**Lưu ý:** Ngày 15 chưa push image lên Docker Hub / registry; chỉ kiểm tra build trên runner GitHub.

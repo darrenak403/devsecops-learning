@@ -1,0 +1,57 @@
+# Ngày 15 — CI: build Docker images cho Beyond8 MFA (API + Web)
+# Folder: Infrastructure/week-02-docker-security
+# Chưa push registry / chưa dùng secrets (theo plan Ngày 15).
+
+name: Day 15 - Beyond8 Docker CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Infrastructure/week-02-docker-security/**'
+      - '.github/workflows/beyond8-docker-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Infrastructure/week-02-docker-security/**'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: Infrastructure/week-02-docker-security
+
+jobs:
+  docker-build:
+    name: Build API & Web (Docker Compose)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Prepare CI env files (placeholder, không dùng secret thật)
+        run: |
+          cp beyond8-mfa/.env.example beyond8-mfa/.env
+          sed -i 's/your_jwt_secret_key/ci-jwt-secret-not-for-production/' beyond8-mfa/.env
+          sed -i 's|postgresql+psycopg2://user:password@host:5432/database|postgresql+psycopg2://beyond8:beyond8@db:5432/beyond8_mfa|' beyond8-mfa/.env
+          sed -i 's/your_app_name/Beyond8 MFA CI/' beyond8-mfa/.env
+
+          cp beyond8-mfa-fe/.env.example beyond8-mfa-fe/.env
+          sed -i 's|your_api_url|http://localhost:8000|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_name|Beyond8 MFA|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_url|http://localhost:3000|' beyond8-mfa-fe/.env
+
+      - name: Check Docker
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Build images (api + web only)
+        run: docker compose build api web
+
+      - name: Show built images
+        run: docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}' | head -20
