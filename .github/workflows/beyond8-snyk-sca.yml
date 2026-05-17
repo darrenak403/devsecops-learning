@@ -1,0 +1,108 @@
+# Ngày 17 — SCA: Snyk quét dependency FE (package.json) + BE (requirements.txt)
+# Folder: Infrastructure/week-02-docker-security
+#
+# GitHub (repo devsecops-learning):
+#   Secrets: SNYK_TOKEN  (Snyk → Account Settings → Auth Token)
+#
+# Ngày 17: pipeline chạy Snyk + đọc report là đủ; chưa bắt buộc 0 vulnerability.
+
+name: Day 17 - Beyond8 Snyk SCA
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa/**'
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa-fe/**'
+      - '.github/workflows/beyond8-snyk-sca.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa/**'
+      - 'Infrastructure/week-02-docker-security/beyond8-mfa-fe/**'
+      - '.github/workflows/beyond8-snyk-sca.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  WEEK02: Infrastructure/week-02-docker-security
+
+jobs:
+  snyk-sca:
+    name: Snyk SCA (API + Web)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Check SNYK_TOKEN
+        run: |
+          if [ -z "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "::error::Thiếu secret SNYK_TOKEN."
+            echo "Snyk → Account Settings → Auth Token → thêm vào GitHub: Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ${{ env.WEEK02 }}/beyond8-mfa-fe/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa-fe
+        run: npm ci
+
+      - name: Snyk test frontend (package.json)
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa-fe
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk test --severity-threshold=high
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ${{ env.WEEK02 }}/beyond8-mfa/requirements.txt
+
+      - name: Install backend dependencies
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Snyk test backend (requirements.txt)
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk test --severity-threshold=high --file=requirements.txt
+
+      - name: Generate Snyk JSON reports (artifact)
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p "${{ env.WEEK02 }}/reports"
+          cd "${{ env.WEEK02 }}/beyond8-mfa-fe"
+          snyk test --json > ../reports/snyk-frontend.json || true
+          cd "${{ env.WEEK02 }}/beyond8-mfa"
+          snyk test --json --file=requirements.txt > ../reports/snyk-backend.json || true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-reports-${{ github.run_id }}
+          path: ${{ env.WEEK02 }}/reports/snyk-*.json
+          if-no-files-found: ignore

@@ -133,3 +133,53 @@ Mẫu config local: `sonar-project.properties.example` (không commit `sonar-pro
 |-----|------------|
 | `CI analysis while Automatic Analysis is enabled` | SonarCloud → **Administration → Analysis Method** → tắt **Automatic Analysis**, re-run workflow. |
 | `can't be indexed twice` (file test) | `sonar.sources` không được chứa thư mục test; dùng `beyond8-mfa/app` + `sonar.tests=beyond8-mfa/app/tests` + exclude `**/app/tests/**` (đã cấu hình trong workflow). |
+
+---
+
+## Snyk SCA (Ngày 17)
+
+Workflow: **`.github/workflows/beyond8-snyk-sca.yml`** (root repo `DevSecOps-30-days`).
+
+| Loại | Tên trên GitHub | Ghi chú |
+|------|-----------------|--------|
+| **Secret** | `SNYK_TOKEN` | Snyk → **Account Settings → Auth Token** (Generate) |
+
+**Trigger:** push/PR lên `main`/`master` khi đổi `beyond8-mfa/`, `beyond8-mfa-fe/`, hoặc **Run workflow** thủ công.
+
+**Scan gì (SCA — thư viện, không phải source code):**
+
+| Project | Manifest | Thư mục |
+|---------|----------|---------|
+| Web (Next.js) | `package.json` + `package-lock.json` | `beyond8-mfa-fe/` |
+| API (Python) | `requirements.txt` (prod) | `beyond8-mfa/` |
+
+**Chính sách mặc định:** `snyk test --severity-threshold=high` → job **fail** nếu có **HIGH** hoặc **CRITICAL** (đúng Lab 5 plan Ngày 17). Ngày 17 vẫn **đạt** nếu pipeline chạy được và bạn **đọc được** report (fix dần sau).
+
+**Artifact:** JSON `reports/snyk-frontend.json`, `snyk-backend.json` (tải từ tab **Actions → run → Artifacts**).
+
+### Local (tuỳ chọn)
+
+```bash
+brew install snyk
+snyk auth
+
+cd Infrastructure/week-02-docker-security/beyond8-mfa-fe
+npm ci
+snyk test --severity-threshold=high
+
+cd ../beyond8-mfa
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+snyk test --severity-threshold=high --file=requirements.txt
+```
+
+### Lỗi thường gặp
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| `Authentication failed` / thiếu token | Thêm `SNYK_TOKEN` trong GitHub Secrets. |
+| `snyk: command not found` (local) | `brew install snyk` hoặc `npm install -g snyk`. |
+| `npm ci` fail | Commit `package-lock.json` khớp `package.json`. |
+| Job fail nhưng vẫn muốn lưu report | Workflow đã có bước upload JSON với `continue-on-error`. |
+
+**Phân biệt:** Sonar (Ngày 16) = **SAST** (code); Snyk (Ngày 17) = **SCA** (dependency); Trivy image (Ngày 18) = OS/package trong Docker image.
