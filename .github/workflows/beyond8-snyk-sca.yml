@@ -87,17 +87,26 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk test --severity-threshold=high --file=requirements.txt
 
-      - name: Generate Snyk JSON reports (artifact)
+      - name: Generate Snyk frontend JSON report
         if: always()
         continue-on-error: true
-        run: |
-          mkdir -p "${{ env.WEEK02 }}/reports"
-          cd "${{ env.WEEK02 }}/beyond8-mfa-fe"
-          snyk test --json > ../reports/snyk-frontend.json || true
-          cd "${{ env.WEEK02 }}/beyond8-mfa"
-          snyk test --json --file=requirements.txt > ../reports/snyk-backend.json || true
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa-fe
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          mkdir -p ../reports
+          snyk test --json > ../reports/snyk-frontend.json || true
+
+      - name: Generate Snyk backend JSON report
+        if: always()
+        continue-on-error: true
+        working-directory: ${{ env.WEEK02 }}/beyond8-mfa
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          mkdir -p ../reports
+          pip install -q -r requirements.txt
+          snyk test --json --file=requirements.txt > ../reports/snyk-backend.json || true
 
       - name: Upload Snyk reports
         if: always()
