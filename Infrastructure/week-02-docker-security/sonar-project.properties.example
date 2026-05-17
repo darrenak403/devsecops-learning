@@ -7,8 +7,8 @@ sonar.organization=YOUR_SONAR_ORGANIZATION
 sonar.projectName=Beyond8 MFA
 sonar.projectVersion=1.0
 
-# Backend Python + Frontend Next.js (relative to thư mục week-02-docker-security)
-sonar.sources=beyond8-mfa,beyond8-mfa-fe
+# Backend Python + Frontend Next.js (sources và tests phải không trùng nhau)
+sonar.sources=beyond8-mfa/app,beyond8-mfa-fe
 sonar.tests=beyond8-mfa/app/tests
 sonar.python.version=3.12
 
@@ -23,6 +23,7 @@ sonar.exclusions=\
 **/reports/**,\
 **/.pytest_cache/**,\
 **/coverage/**,\
-**/.git/**
+**/.git/**,\
+**/app/tests/**
 
 sonar.sourceEncoding=UTF-8

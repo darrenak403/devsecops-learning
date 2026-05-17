@@ -65,10 +65,10 @@ jobs:
           sonar.organization=${{ vars.SONAR_ORGANIZATION }}
           sonar.projectName=Beyond8 MFA
           sonar.projectVersion=${{ github.sha }}
-          sonar.sources=beyond8-mfa,beyond8-mfa-fe
+          sonar.sources=beyond8-mfa/app,beyond8-mfa-fe
           sonar.tests=beyond8-mfa/app/tests
           sonar.python.version=3.12
-          sonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/__pycache__/**,**/.venv/**,**/venv/**,**/reports/**,**/.pytest_cache/**,**/coverage/**,**/.git/**,**/CLAUDE.md,**/AGENTS.md
+          sonar.exclusions=**/node_modules/**,**/.next/**,**/dist/**,**/build/**,**/__pycache__/**,**/.venv/**,**/venv/**,**/reports/**,**/.pytest_cache/**,**/coverage/**,**/.git/**,**/CLAUDE.md,**/AGENTS.md,**/app/tests/**
           sonar.sourceEncoding=UTF-8
           EOF
           echo "--- sonar-project.properties (keys only) ---"

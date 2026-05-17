@@ -127,4 +127,9 @@ Workflow: **`.github/workflows/beyond8-sonarcloud-sast.yml`** (root repo `DevSec
 
 Mẫu config local: `sonar-project.properties.example` (không commit `sonar-project.properties` nếu chỉ dùng CI generate).
 
-**Lỗi thường gặp — `CI analysis while Automatic Analysis is enabled`:** trên SonarCloud vào **Project → Administration → Analysis Method** → **tắt Automatic Analysis** (chỉ giữ scan qua GitHub Actions). Sau đó re-run workflow.
+**Lỗi thường gặp**
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| `CI analysis while Automatic Analysis is enabled` | SonarCloud → **Administration → Analysis Method** → tắt **Automatic Analysis**, re-run workflow. |
+| `can't be indexed twice` (file test) | `sonar.sources` không được chứa thư mục test; dùng `beyond8-mfa/app` + `sonar.tests=beyond8-mfa/app/tests` + exclude `**/app/tests/**` (đã cấu hình trong workflow). |
