@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError
+from jwt.exceptions import PyJWTError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -109,7 +109,7 @@ def get_current_user(
         # course_viewer token must only be accepted by get_current_course_user.
         if user_id is None or role == "course_viewer" or not session_id:
             raise credentials_exception
-    except JWTError as exc:
+    except PyJWTError as exc:
         raise credentials_exception from exc
 
     user = crud_user.get_by_id(db, user_id)
@@ -158,7 +158,7 @@ def get_current_course_user(
         session_id: str | None = payload.get("sid")
         if user_id is None or role != "course_viewer":
             raise credentials_exception
-    except JWTError as exc:
+    except PyJWTError as exc:
         raise credentials_exception from exc
 
     user = crud_user.get_by_id(db, user_id)

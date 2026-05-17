@@ -8,9 +8,8 @@ SQLAlchemy==2.0.41
 alembic==1.14.0
 psycopg2-binary==2.9.11
 asyncpg==0.30.0
-# 3.5.0: cho phép pyasn1>=0.5 (khớp bản vá CVE); 3.4.0 kẹt pyasn1<0.5
-python-jose[cryptography]==3.5.0
-pyasn1>=0.6.3
+# HS256 only — PyJWT tránh transitive ecdsa từ python-jose (Snyk/Trivy, không có bản vá)
+PyJWT[crypto]==2.10.1
 python-multipart==0.0.27
 redis==5.2.1
 upstash-redis==1.7.0
