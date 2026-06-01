@@ -1,0 +1,119 @@
+# Ngày 19 — Build → Trivy (CRITICAL gate) → push DOCR (chỉ trên main/master)
+# Folder: Infrastructure/week-02-docker-security
+#
+# GitHub Secret: DIGITALOCEAN_ACCESS_TOKEN
+# Đổi DOCR_REGISTRY_NAME bên dưới nếu registry trên DO khác tên devsecops-registry
+#
+# Không chạy trên pull_request — tránh push image / lộ token từ fork.
+
+name: Day 19 - Beyond8 Build Scan Push DOCR
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Infrastructure/week-02-docker-security/**'
+      - '.github/workflows/beyond8-docr-push.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  WEEK02: Infrastructure/week-02-docker-security
+  REGISTRY: registry.digitalocean.com
+  # Đổi tên này cho khớp Container Registry trên DigitalOcean
+  DOCR_REGISTRY_NAME: devsecops-registry
+  API_IMAGE_NAME: beyond8-api
+  WEB_IMAGE_NAME: beyond8-web
+
+jobs:
+  build-scan-push:
+    name: Build, Trivy gate, push to DOCR
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.WEEK02 }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set DOCR image tags
+        run: |
+          echo "API_IMAGE=${REGISTRY}/${DOCR_REGISTRY_NAME}/${API_IMAGE_NAME}:${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "WEB_IMAGE=${REGISTRY}/${DOCR_REGISTRY_NAME}/${WEB_IMAGE_NAME}:${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "API_IMAGE=$API_IMAGE"
+          echo "WEB_IMAGE=$WEB_IMAGE"
+
+      - name: Prepare CI env files (placeholder, không dùng secret thật)
+        run: |
+          cp beyond8-mfa/.env.example beyond8-mfa/.env
+          sed -i 's/your_jwt_secret_key/ci-jwt-secret-not-for-production/' beyond8-mfa/.env
+          sed -i 's|postgresql+psycopg2://user:password@host:5432/database|postgresql+psycopg2://beyond8:beyond8@db:5432/beyond8_mfa|' beyond8-mfa/.env
+          sed -i 's/your_app_name/Beyond8 MFA CI/' beyond8-mfa/.env
+
+          cp beyond8-mfa-fe/.env.example beyond8-mfa-fe/.env
+          sed -i 's|your_api_url|http://localhost:8000|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_name|Beyond8 MFA|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_url|http://localhost:3000|' beyond8-mfa-fe/.env
+
+      - name: Build API image
+        run: docker build -t "$API_IMAGE" ./beyond8-mfa
+
+      - name: Build Web image
+        run: |
+          docker build -t "$WEB_IMAGE" \
+            --build-arg NEXT_PUBLIC_API_URL=http://localhost:8000 \
+            --build-arg NEXT_PUBLIC_APP_NAME="Beyond8 MFA CI" \
+            --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+            --build-arg NEXT_PUBLIC_ENV=production \
+            ./beyond8-mfa-fe
+
+      - name: Show built images
+        run: docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}' | grep -E 'beyond8-api|beyond8-web|digitalocean' || true
+
+      - name: Trivy scan API image (block CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.API_IMAGE }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL
+
+      - name: Trivy scan Web image (block CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.WEB_IMAGE }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL
+
+      - name: Check DIGITALOCEAN_ACCESS_TOKEN
+        run: |
+          if [ -z "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" ]; then
+            echo "::error::Thiếu secret DIGITALOCEAN_ACCESS_TOKEN."
+            echo "DigitalOcean → API → Tokens → Generate → GitHub: Settings → Secrets → Actions."
+            exit 1
+          fi
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Login to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Push API image to DOCR
+        run: docker push "$API_IMAGE"
+
+      - name: Push Web image to DOCR
+        run: docker push "$WEB_IMAGE"

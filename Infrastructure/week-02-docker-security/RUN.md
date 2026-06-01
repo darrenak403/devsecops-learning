@@ -242,3 +242,63 @@ Xem thêm `reports/README.md` và file `reports/trivy-*-after.txt` (scan local t
 | Report không upload | Bước generate report dùng `continue-on-error`; gate CRITICAL chạy sau. |
 
 **Phân biệt pipeline:** Ngày 15 = build; Ngày 16 = SAST; Ngày 17 = SCA manifest; **Ngày 18 = scan image vừa build**.
+
+---
+
+## Push image lên DOCR (Ngày 19)
+
+Workflow: **`.github/workflows/beyond8-docr-push.yml`**.
+
+**Secret bắt buộc:** `DIGITALOCEAN_ACCESS_TOKEN` (DigitalOcean Personal Access Token, quyền đọc/ghi Container Registry).
+
+**Chỉ chạy khi push `main`/`master`** — không push trên PR (an toàn hơn).
+
+**Luồng:**
+
+```text
+Build image (tag DOCR đầy đủ)
+  → Trivy CRITICAL gate
+  → doctl registry login
+  → docker push API + Web
+```
+
+| Image trên DOCR | Ví dụ tag |
+|-----------------|-----------|
+| `registry.digitalocean.com/<tên-registry>/beyond8-api` | `${{ github.sha }}` |
+| `registry.digitalocean.com/<tên-registry>/beyond8-web` | `${{ github.sha }}` |
+
+Mặc định workflow dùng registry name **`devsecops-registry`** — sửa `DOCR_REGISTRY_NAME` trong file workflow nếu bạn đặt tên khác trên DigitalOcean.
+
+**Day 19 PASS:** Trivy pass → push thành công → thấy 2 repository trên DO UI.
+
+### Local test trước CI (tuỳ chọn)
+
+```bash
+brew install doctl
+doctl auth init
+
+doctl registry create devsecops-registry --region sgp1   # bỏ qua nếu đã có
+doctl registry login
+
+cd Infrastructure/week-02-docker-security
+docker build -t beyond8-api:local ./beyond8-mfa
+docker build -t beyond8-web:local ./beyond8-mfa-fe
+
+docker tag beyond8-api:local registry.digitalocean.com/devsecops-registry/beyond8-api:local
+docker tag beyond8-web:local registry.digitalocean.com/devsecops-registry/beyond8-web:local
+docker push registry.digitalocean.com/devsecops-registry/beyond8-api:local
+docker push registry.digitalocean.com/devsecops-registry/beyond8-web:local
+
+doctl registry repository list
+```
+
+### Lỗi thường gặp
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| `unauthorized` / `authentication required` | Kiểm tra `DIGITALOCEAN_ACCESS_TOKEN`; token cần quyền registry read/write. |
+| `registry not found` | Tạo registry trên DO hoặc sửa `DOCR_REGISTRY_NAME` cho khớp. |
+| Trivy fail, không push | Đúng thiết kế — sửa image rồi push lại. |
+| `requested access denied` | Sai format tag; phải `registry.digitalocean.com/<registry>/<image>:<tag>`. |
+
+**Cleanup:** Xóa tag `local` / SHA cũ trên DO khi học xong để giảm dung lượng registry.
