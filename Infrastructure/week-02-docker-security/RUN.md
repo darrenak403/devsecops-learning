@@ -262,12 +262,16 @@ Build image (tag DOCR đầy đủ)
   → docker push API + Web
 ```
 
-| Image trên DOCR | Ví dụ tag |
-|-----------------|-----------|
-| `registry.digitalocean.com/<tên-registry>/beyond8-api` | `${{ github.sha }}` |
-| `registry.digitalocean.com/<tên-registry>/beyond8-web` | `${{ github.sha }}` |
+| Image trên DOCR | Ví dụ |
+|-----------------|--------|
+| API | `registry.digitalocean.com/devsecops-registry/beyond8:api-<sha>` |
+| Web | `registry.digitalocean.com/devsecops-registry/beyond8:web-<sha>` |
+
+**DOCR Starter** chỉ cho **1 repository** trong registry — workflow dùng **một repo `beyond8`**, hai tag `api-*` / `web-*` (không tách `beyond8-api` + `beyond8-web`). Nâng plan DO nếu muốn 2 repository riêng.
 
 Mặc định workflow dùng registry name **`devsecops-registry`** — sửa `DOCR_REGISTRY_NAME` trong file workflow nếu bạn đặt tên khác trên DigitalOcean.
+
+Nếu lần push trước đã tạo repo `beyond8-api` trên DO: **xóa repository đó** (tab Repositories) rồi re-run workflow để tránh vẫn占 slot 1/1.
 
 **Day 19 PASS:** Trivy pass → push thành công → thấy 2 repository trên DO UI.
 
@@ -284,10 +288,10 @@ cd Infrastructure/week-02-docker-security
 docker build -t beyond8-api:local ./beyond8-mfa
 docker build -t beyond8-web:local ./beyond8-mfa-fe
 
-docker tag beyond8-api:local registry.digitalocean.com/devsecops-registry/beyond8-api:local
-docker tag beyond8-web:local registry.digitalocean.com/devsecops-registry/beyond8-web:local
-docker push registry.digitalocean.com/devsecops-registry/beyond8-api:local
-docker push registry.digitalocean.com/devsecops-registry/beyond8-web:local
+docker tag beyond8-api:local registry.digitalocean.com/devsecops-registry/beyond8:api-local
+docker tag beyond8-web:local registry.digitalocean.com/devsecops-registry/beyond8:web-local
+docker push registry.digitalocean.com/devsecops-registry/beyond8:api-local
+docker push registry.digitalocean.com/devsecops-registry/beyond8:web-local
 
 doctl registry repository list
 ```
@@ -300,5 +304,6 @@ doctl registry repository list
 | `registry not found` | Tạo registry trên DO hoặc sửa `DOCR_REGISTRY_NAME` cho khớp. |
 | Trivy fail, không push | Đúng thiết kế — sửa image rồi push lại. |
 | `requested access denied` | Sai format tag; phải `registry.digitalocean.com/<registry>/<image>:<tag>`. |
+| `registry contains 1 repositories, limit is 1` | Plan Starter — xóa repo cũ trên DO, dùng 1 repo `beyond8` + tag `api-*`/`web-*` (workflow đã cấu hình). |
 
 **Cleanup:** Xóa tag `local` / SHA cũ trên DO khi học xong để giảm dung lượng registry.
