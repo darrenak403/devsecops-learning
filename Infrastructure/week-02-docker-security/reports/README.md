@@ -1,12 +1,16 @@
 # Security reports (week 02)
 
-## Trivy (Ngày 13 — image scan)
+## Trivy (Ngày 13 local / Ngày 18 CI)
+
+**Local** (sau `docker compose build api web`):
 
 ```bash
 cd Infrastructure/week-02-docker-security
-trivy image --severity HIGH,CRITICAL beyond8-api:latest > reports/trivy-api-after.txt
-trivy image --severity HIGH,CRITICAL beyond8-web:latest > reports/trivy-web-after.txt
+trivy image --severity HIGH,CRITICAL --ignore-unfixed beyond8-api:latest > reports/trivy-api-after.txt
+trivy image --severity HIGH,CRITICAL --ignore-unfixed beyond8-web:latest > reports/trivy-web-after.txt
 ```
+
+**CI (Ngày 18):** workflow `beyond8-trivy-image-scan.yml` build `beyond8-api:$GITHUB_SHA` / `beyond8-web:$GITHUB_SHA`, gate **CRITICAL**, artifact `trivy-reports-*` → `trivy-api-ci.txt`, `trivy-web-ci.txt`.
 
 Nếu Trivy báo lỗi DB (panic bbolt): `trivy clean --vuln-db` rồi quét lại.
 

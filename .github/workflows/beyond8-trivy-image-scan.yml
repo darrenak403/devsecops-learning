@@ -1,0 +1,130 @@
+# Ngày 18 — Container scan: build image rồi Trivy quét trên GitHub Actions
+# Folder: Infrastructure/week-02-docker-security
+#
+# Policy: fail nếu CRITICAL (có bản vá); ignore-unfixed: true
+# Không cần secrets. Chuẩn bị push registry ở Ngày 19.
+
+name: Day 18 - Beyond8 Trivy Image Scan
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Infrastructure/week-02-docker-security/**'
+      - '.github/workflows/beyond8-trivy-image-scan.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Infrastructure/week-02-docker-security/**'
+      - '.github/workflows/beyond8-trivy-image-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  WEEK02: Infrastructure/week-02-docker-security
+  API_IMAGE: beyond8-api:${{ github.sha }}
+  WEB_IMAGE: beyond8-web:${{ github.sha }}
+
+jobs:
+  build-and-trivy-scan:
+    name: Build images and scan with Trivy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.WEEK02 }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Prepare CI env files (placeholder, không dùng secret thật)
+        run: |
+          cp beyond8-mfa/.env.example beyond8-mfa/.env
+          sed -i 's/your_jwt_secret_key/ci-jwt-secret-not-for-production/' beyond8-mfa/.env
+          sed -i 's|postgresql+psycopg2://user:password@host:5432/database|postgresql+psycopg2://beyond8:beyond8@db:5432/beyond8_mfa|' beyond8-mfa/.env
+          sed -i 's/your_app_name/Beyond8 MFA CI/' beyond8-mfa/.env
+
+          cp beyond8-mfa-fe/.env.example beyond8-mfa-fe/.env
+          sed -i 's|your_api_url|http://localhost:8000|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_name|Beyond8 MFA|' beyond8-mfa-fe/.env
+          sed -i 's|your_app_url|http://localhost:3000|' beyond8-mfa-fe/.env
+
+      - name: Check Docker
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Build API image
+        run: docker build -t "$API_IMAGE" ./beyond8-mfa
+
+      - name: Build Web image
+        run: |
+          docker build -t "$WEB_IMAGE" \
+            --build-arg NEXT_PUBLIC_API_URL=http://localhost:8000 \
+            --build-arg NEXT_PUBLIC_APP_NAME="Beyond8 MFA CI" \
+            --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+            --build-arg NEXT_PUBLIC_ENV=production \
+            ./beyond8-mfa-fe
+
+      - name: Show built images
+        run: docker images --format 'table {{.Repository}}\t{{.Tag}}\t{{.Size}}' | grep -E 'beyond8-api|beyond8-web' || true
+
+      - name: Create reports directory
+        run: mkdir -p reports
+
+      - name: Generate API Trivy report (HIGH,CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.API_IMAGE }}
+          format: table
+          output: ${{ env.WEEK02 }}/reports/trivy-api-ci.txt
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+        continue-on-error: true
+
+      - name: Generate Web Trivy report (HIGH,CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.WEB_IMAGE }}
+          format: table
+          output: ${{ env.WEEK02 }}/reports/trivy-web-ci.txt
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+        continue-on-error: true
+
+      - name: Upload Trivy reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports-${{ github.run_id }}
+          path: ${{ env.WEEK02 }}/reports/trivy-*-ci.txt
+          if-no-files-found: ignore
+
+      - name: Enforce API image — no CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.API_IMAGE }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL
+
+      - name: Enforce Web image — no CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.WEB_IMAGE }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL

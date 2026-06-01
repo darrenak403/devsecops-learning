@@ -183,3 +183,62 @@ snyk test --severity-threshold=high --file=requirements.txt
 | Job fail nhưng vẫn muốn lưu report | Workflow đã có bước upload JSON với `continue-on-error`. |
 
 **Phân biệt:** Sonar (Ngày 16) = **SAST** (code); Snyk (Ngày 17) = **SCA** (dependency); Trivy image (Ngày 18) = OS/package trong Docker image.
+
+---
+
+## Trivy image scan (Ngày 18)
+
+Workflow: **`.github/workflows/beyond8-trivy-image-scan.yml`** (root repo `DevSecOps-30-days`).
+
+**Không cần secret** — chỉ build + scan trên runner GitHub.
+
+**Trigger:** push/PR lên `main`/`master` khi đổi `Infrastructure/week-02-docker-security/**`, hoặc **Run workflow** thủ công.
+
+**Luồng CI:**
+
+```text
+Checkout → tạo .env CI → docker build API/Web
+  → Trivy report (HIGH,CRITICAL) → upload artifact
+  → Trivy gate CRITICAL (fail pipeline nếu còn CRITICAL có bản vá)
+```
+
+| Image tag | Nguồn build |
+|-----------|-------------|
+| `beyond8-api:${{ github.sha }}` | `beyond8-mfa/Dockerfile` |
+| `beyond8-web:${{ github.sha }}` | `beyond8-mfa-fe/Dockerfile` |
+
+**Policy hiện tại:**
+
+```yaml
+severity: CRITICAL
+exit-code: '1'
+ignore-unfixed: true
+vuln-type: os,library
+```
+
+Sau khi image sạch hơn, có thể nâng gate lên `HIGH,CRITICAL`.
+
+**Artifact:** `trivy-reports-<run_id>` gồm `trivy-api-ci.txt`, `trivy-web-ci.txt` (Actions → run → Artifacts).
+
+### Local (tuỳ chọn, Ngày 12–13)
+
+```bash
+cd Infrastructure/week-02-docker-security
+docker compose build api web
+docker tag beyond8-api beyond8-api:latest   # tên image sau compose có thể là beyond8-api
+trivy image --severity HIGH,CRITICAL --ignore-unfixed beyond8-api:latest
+trivy image --severity HIGH,CRITICAL --ignore-unfixed beyond8-web:latest
+```
+
+Xem thêm `reports/README.md` và file `reports/trivy-*-after.txt` (scan local trước đó).
+
+### Lỗi thường gặp
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| Trivy không tìm thấy image | Kiểm tra step **Show built images**; `image-ref` phải trùng tag vừa `docker build -t`. |
+| Gate CRITICAL fail | `docker build --pull --no-cache`, cập nhật base image / dependency, scan lại. |
+| Scan rất lâu (lần đầu) | Trivy tải vulnerability DB; các lần sau nhanh hơn. |
+| Report không upload | Bước generate report dùng `continue-on-error`; gate CRITICAL chạy sau. |
+
+**Phân biệt pipeline:** Ngày 15 = build; Ngày 16 = SAST; Ngày 17 = SCA manifest; **Ngày 18 = scan image vừa build**.
