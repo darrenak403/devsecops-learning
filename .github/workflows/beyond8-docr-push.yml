@@ -1,15 +1,15 @@
-# Ngày 19 — Build → Trivy (CRITICAL gate) → push DOCR (chỉ trên main/master)
+# Ngày 19–20 — Build → Trivy → push DOCR → Cosign keyless sign + verify
 # Folder: Infrastructure/week-02-docker-security
 #
-# GitHub Secret: DIGITALOCEAN_ACCESS_TOKEN
-# Đổi DOCR_REGISTRY_NAME bên dưới nếu registry trên DO khác tên devsecops-registry
+# Secrets: DIGITALOCEAN_ACCESS_TOKEN
+# Cosign keyless: cần permissions id-token: write (không cần secret Cosign)
 #
 # Plan Starter DOCR: tối đa 1 repository → dùng 1 repo "beyond8", tag api-<sha> / web-<sha>
 # (không dùng 2 repo beyond8-api + beyond8-web). Nâng plan DO nếu cần nhiều repository.
 #
 # Không chạy trên pull_request — tránh push image / lộ token từ fork.
 
-name: Day 19 - Beyond8 Build Scan Push DOCR
+name: Day 19-20 - Beyond8 DOCR Push and Cosign Sign
 
 on:
   push:
@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   WEEK02: Infrastructure/week-02-docker-security
@@ -34,7 +35,7 @@ env:
 
 jobs:
   build-scan-push:
-    name: Build, Trivy gate, push to DOCR
+    name: Build, Trivy, push DOCR, Cosign sign
     runs-on: ubuntu-latest
 
     defaults:
@@ -120,3 +121,37 @@ jobs:
 
       - name: Push Web image to DOCR
         run: docker push "$WEB_IMAGE"
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.2
+
+      - name: Resolve image digests (ký theo digest, không chỉ tag)
+        run: |
+          API_IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$API_IMAGE")
+          WEB_IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$WEB_IMAGE")
+          if [ -z "$API_IMAGE_DIGEST" ] || [ -z "$WEB_IMAGE_DIGEST" ]; then
+            echo "::error::Không lấy được digest sau push — kiểm tra docker push và doctl registry login."
+            exit 1
+          fi
+          echo "API_IMAGE_DIGEST=$API_IMAGE_DIGEST" >> "$GITHUB_ENV"
+          echo "WEB_IMAGE_DIGEST=$WEB_IMAGE_DIGEST" >> "$GITHUB_ENV"
+          echo "API_IMAGE_DIGEST=$API_IMAGE_DIGEST"
+          echo "WEB_IMAGE_DIGEST=$WEB_IMAGE_DIGEST"
+
+      - name: Sign API image (Cosign keyless / GitHub OIDC)
+        run: cosign sign --yes "$API_IMAGE_DIGEST"
+
+      - name: Sign Web image (Cosign keyless / GitHub OIDC)
+        run: cosign sign --yes "$WEB_IMAGE_DIGEST"
+
+      - name: Verify API image signature
+        run: |
+          cosign verify "$API_IMAGE_DIGEST" \
+            --certificate-identity-regexp "https://github.com/${{ github.repository }}/.github/workflows/.*" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+
+      - name: Verify Web image signature
+        run: |
+          cosign verify "$WEB_IMAGE_DIGEST" \
+            --certificate-identity-regexp "https://github.com/${{ github.repository }}/.github/workflows/.*" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"

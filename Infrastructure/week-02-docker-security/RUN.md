@@ -260,6 +260,7 @@ Build image (tag DOCR đầy đủ)
   → Trivy CRITICAL gate
   → doctl registry login
   → docker push API + Web
+  → Cosign sign + verify (Ngày 20)
 ```
 
 | Image trên DOCR | Ví dụ |
@@ -307,3 +308,48 @@ doctl registry repository list
 | `registry contains 1 repositories, limit is 1` | Plan Starter — xóa repo cũ trên DO, dùng 1 repo `beyond8` + tag `api-*`/`web-*` (workflow đã cấu hình). |
 
 **Cleanup:** Xóa tag `local` / SHA cũ trên DO khi học xong để giảm dung lượng registry.
+
+---
+
+## Cosign ký image (Ngày 20)
+
+Workflow: **cùng file** `.github/workflows/beyond8-docr-push.yml` (job đã gộp Ngày 19 + 20).
+
+**Secret thêm:** không cần — dùng **Cosign keyless** qua GitHub OIDC (`id-token: write`).
+
+**Luồng sau push:**
+
+```text
+Resolve digest (@sha256:…)
+  → cosign sign --yes (keyless)
+  → cosign verify (đúng repo + issuer GitHub Actions)
+```
+
+| Image | Ký theo |
+|-------|---------|
+| API | `registry.digitalocean.com/.../beyond8@sha256:…` (digest tag `api-<sha>`) |
+| Web | cùng repo `beyond8`, digest riêng |
+
+**Day 20 PASS:** Actions xanh tới **Verify API/Web image signature**; log có digest + verify OK.
+
+### Verify local (tuỳ chọn)
+
+Sau khi CI chạy, copy digest từ log workflow:
+
+```bash
+brew install cosign
+doctl registry login
+
+cosign verify registry.digitalocean.com/devsecops-registry/beyond8@sha256:<digest-api> \
+  --certificate-identity-regexp "https://github.com/<owner>/<repo>/.github/workflows/.*" \
+  --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+```
+
+### Lỗi thường gặp
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| Cosign sign fail OIDC | Thêm `id-token: write` trong workflow `permissions`. |
+| Verify identity mismatch | Regexp phải khớp `github.repository` thật (owner/repo). |
+| Sign/verify unauthorized | Chạy `doctl registry login` trước (CI đã login trước push). |
+| Không lấy được digest | Push phải thành công; `docker inspect` cần `RepoDigests`. |
